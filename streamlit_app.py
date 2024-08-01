@@ -7,7 +7,7 @@ model = joblib.load('restaurant_revenue_model.pkl')
 scaler = joblib.load('scaler.pkl')
 pca = joblib.load('pca.pkl')
 
-# Get the list of original feature names
+# Get the list of original feature names used during training
 feature_names = ['Name','Franchise','Category','City','No_Of_Item','Order_Placed']  # Update with actual feature names
 
 # Title
@@ -27,7 +27,19 @@ input_data_pca = pca.transform(input_data_scaled)
 
 # Button to make prediction
 if st.button('Predict'):
-    # Make prediction
-    prediction = model.predict(input_data_pca)
-    
-    st.write(f'The predicted revenue is: ${prediction[0]:.2f}')
+    try:
+        # Make prediction
+        prediction = model.predict(input_data_pca)
+        st.write(f'The predicted revenue is: ${prediction[0]:.2f}')
+    except Exception as e:
+        st.write(f'Error: {e}')
+
+
+
+
+
+
+
+
+
+
