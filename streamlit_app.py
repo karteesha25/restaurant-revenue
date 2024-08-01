@@ -18,8 +18,17 @@ Order_Placed = st.number_input('Order Placed', min_value=1, max_value=1000, valu
 if st.button('Predict'):
     # Prepare the input data
     input_data = np.array([[No_Of_Item, Order_Placed]])  # Ensure all features are included
-    input_data_scaled = scaler.transform(input_data)  # Scale the input data
+    
+    # Debugging statements
+    st.write(f"Input data shape: {input_data.shape}")
+    st.write(f"Scaler expected input shape: {scaler.n_features_in_}")
 
-    # Make the prediction
-    prediction = model.predict(input_data_scaled)
-    st.write(f'The predicted revenue is: {prediction[0]:.2f}')
+    try:
+        input_data_scaled = scaler.transform(input_data)  # Scale the input data
+        # Make the prediction
+        prediction = model.predict(input_data_scaled)
+        st.write(f'The predicted revenue is: {prediction[0]:.2f}')
+    except ValueError as e:
+        st.error(f"Error: {e}")
+        st.error("Check the number of features in the input data and the scaler.")
+
