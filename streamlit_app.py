@@ -2,33 +2,32 @@ import streamlit as st
 import numpy as np
 import joblib
 
-# Load the model and scaler
+# Load the model, scaler, and PCA
 model = joblib.load('restaurant_revenue_model.pkl')
 scaler = joblib.load('scaler.pkl')
+pca = joblib.load('pca.pkl')
+
+# Get the list of original feature names
+feature_names = ['Name','Franchise','Category','City','No_Of_Item','Order_Placed']  # Update with actual feature names
 
 # Title
 st.title('Restaurant Revenue Prediction')
 
-# Define the input fields based on your feature set
-No_Of_Item = st.number_input('Number of Items', min_value=1, max_value=1000, value=10)
-Order_Placed = st.number_input('Order Placed', min_value=1, max_value=1000, value=50)
-# Add more input fields if there are more features in your dataset
+# Input fields for the original features
+input_data = {feature: st.number_input(feature, min_value=0, value=0) for feature in feature_names}
 
-# When 'Predict' button is clicked, make the prediction and display it
+# Prepare input data
+input_data_array = np.array([list(input_data.values())])
+
+# Scale the input data
+input_data_scaled = scaler.transform(input_data_array)
+
+# Apply PCA transformation
+input_data_pca = pca.transform(input_data_scaled)
+
+# Button to make prediction
 if st.button('Predict'):
-    # Prepare the input data
-    input_data = np.array([[No_Of_Item, Order_Placed]])  # Ensure all features are included
+    # Make prediction
+    prediction = model.predict(input_data_pca)
     
-    # Debugging statements
-    st.write(f"Input data shape: {input_data.shape}")
-    st.write(f"Scaler expected input shape: {scaler.n_features_in_}")
-
-    try:
-        input_data_scaled = scaler.transform(input_data)  # Scale the input data
-        # Make the prediction
-        prediction = model.predict(input_data_scaled)
-        st.write(f'The predicted revenue is: {prediction[0]:.2f}')
-    except ValueError as e:
-        st.error(f"Error: {e}")
-        st.error("Check the number of features in the input data and the scaler.")
-
+    st.write(f'The predicted revenue is: ${prediction[0]:.2f}')
